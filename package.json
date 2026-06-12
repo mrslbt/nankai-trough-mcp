@@ -1,8 +1,8 @@
 {
-  "name": "nankai-mcp",
+  "name": "nankai-trough-mcp",
   "version": "0.1.0",
   "description": "Honest Nankai Trough (南海トラフ地震) earthquake hazard + building-safety engine for AI assistants. Surfaces only official Japanese government data, never a safety verdict.",
-  "mcpName": "io.github.mrslbt/nankai",
+  "mcpName": "io.github.mrslbt/nankai-trough",
   "keywords": [
     "mcp",
     "mcp-server",
@@ -25,7 +25,7 @@
   "license": "MIT",
   "type": "module",
   "bin": {
-    "nankai-mcp": "dist/index.js"
+    "nankai-trough-mcp": "dist/index.js"
   },
   "files": [
     "dist"
@@ -33,10 +33,10 @@
   "engines": {
     "node": ">=18.0.0"
   },
-  "homepage": "https://github.com/mrslbt/nankai-mcp#readme",
+  "homepage": "https://github.com/mrslbt/nankai-trough-mcp#readme",
   "repository": {
     "type": "git",
-    "url": "https://github.com/mrslbt/nankai-mcp.git"
+    "url": "https://github.com/mrslbt/nankai-trough-mcp.git"
   },
   "scripts": {
     "build": "tsc && chmod +x dist/index.js",

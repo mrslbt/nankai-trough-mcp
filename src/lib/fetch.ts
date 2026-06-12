@@ -6,7 +6,7 @@ export async function safeFetch(url: string, options?: RequestInit, timeoutMs = 
     const res = await fetch(url, {
       ...options,
       signal: controller.signal,
-      headers: { "User-Agent": "nankai-mcp (+https://github.com/mrslbt/nankai-mcp)", ...(options?.headers ?? {}) },
+      headers: { "User-Agent": "nankai-trough-mcp (+https://github.com/mrslbt/nankai-trough-mcp)", ...(options?.headers ?? {}) },
     });
     if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
     return res;

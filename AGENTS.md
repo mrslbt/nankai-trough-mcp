@@ -1,12 +1,12 @@
-# AGENTS.md — nankai-mcp
+# AGENTS.md — nankai-trough-mcp
 
 Guide for AI coding agents (Claude Code, Cursor, Codex, Copilot…) working in this repo.
 
 ## What this project is
 
-**nankai-mcp** — an MCP server that surfaces official Japanese government data on the Nankai Trough (南海トラフ地震) earthquake hazard and Japanese building seismic standards, so an AI assistant can answer "how bad is it, how far does it reach, and what does my build year mean?" with cited figures instead of guesses. It never returns a safety verdict.
+**nankai-trough-mcp** — an MCP server that surfaces official Japanese government data on the Nankai Trough (南海トラフ地震) earthquake hazard and Japanese building seismic standards, so an AI assistant can answer "how bad is it, how far does it reach, and what does my build year mean?" with cited figures instead of guesses. It never returns a safety verdict.
 
-- npm: `nankai-mcp` · registry name: `io.github.mrslbt/nankai`
+- npm: `nankai-trough-mcp` · registry name: `io.github.mrslbt/nankai-trough`
 - Local **stdio** server, **read-only**, bundled data + one official geocoder call — no API keys.
 - Six tools, two prompts, four resources. Entry tool: **`nankai_overview`** (scale and reach); **`official_hazard_maps`** bridges to the official per-address maps.
 
@@ -96,7 +96,7 @@ Bump the version in **all three** places (they must match) and keep the names al
 2. `src/index.ts` → the `McpServer({ version })`
 3. `server.json` → top-level `version` **and** `packages[0].version`
 
-`package.json` `mcpName` **must equal** `server.json` `name` (`io.github.mrslbt/nankai`) — the registry validates npm ownership against it. Then: `npm run build && npm test` → `git push` → `npm publish` → `mcp-publisher publish` (npm must publish first; the registry verifies it). `server.json` `description` is capped at **100 chars**.
+`package.json` `mcpName` **must equal** `server.json` `name` (`io.github.mrslbt/nankai-trough`) — the registry validates npm ownership against it. Then: `npm run build && npm test` → `git push` → `npm publish` → `mcp-publisher publish` (npm must publish first; the registry verifies it). `server.json` `description` is capped at **100 chars**.
 
 ## Conventions
 

@@ -1,4 +1,4 @@
-# nankai-mcp
+# nankai-trough-mcp
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
@@ -24,7 +24,7 @@ The authoritative data is real, but it's scattered across five agencies and most
 ## Install
 
 ```bash
-claude mcp add nankai -- npx -y nankai-mcp
+claude mcp add nankai -- npx -y nankai-trough-mcp
 ```
 
 ### JSON config
@@ -37,7 +37,7 @@ The server config is the same across clients; only the file path differs.
 ```json
 {
   "mcpServers": {
-    "nankai": { "command": "npx", "args": ["-y", "nankai-mcp"] }
+    "nankai": { "command": "npx", "args": ["-y", "nankai-trough-mcp"] }
   }
 }
 ```
@@ -50,7 +50,7 @@ The server config is the same across clients; only the file path differs.
 ```json
 {
   "mcpServers": {
-    "nankai": { "command": "npx", "args": ["-y", "nankai-mcp"] }
+    "nankai": { "command": "npx", "args": ["-y", "nankai-trough-mcp"] }
   }
 }
 ```
@@ -63,7 +63,7 @@ The server config is the same across clients; only the file path differs.
 ```json
 {
   "servers": {
-    "nankai": { "type": "stdio", "command": "npx", "args": ["-y", "nankai-mcp"] }
+    "nankai": { "type": "stdio", "command": "npx", "args": ["-y", "nankai-trough-mcp"] }
   }
 }
 ```
@@ -76,7 +76,7 @@ The server config is the same across clients; only the file path differs.
 ```json
 {
   "mcpServers": {
-    "nankai": { "command": "npx", "args": ["-y", "nankai-mcp"] }
+    "nankai": { "command": "npx", "args": ["-y", "nankai-trough-mcp"] }
   }
 }
 ```
@@ -90,15 +90,15 @@ Config path:
 ### From source
 
 ```bash
-git clone https://github.com/mrslbt/nankai-mcp.git
-cd nankai-mcp
+git clone https://github.com/mrslbt/nankai-trough-mcp.git
+cd nankai-trough-mcp
 npm install && npm run build
 ```
 
 Point the client config at the built entry:
 
 ```json
-{ "command": "node", "args": ["/absolute/path/to/nankai-mcp/dist/index.js"] }
+{ "command": "node", "args": ["/absolute/path/to/nankai-trough-mcp/dist/index.js"] }
 ```
 
 ## Tools

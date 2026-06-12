@@ -27,7 +27,7 @@ const LANG = z
   .meta({ title: "Language" });
 
 const server = new McpServer(
-  { name: "nankai-mcp", version: "0.1.0" },
+  { name: "nankai-trough-mcp", version: "0.1.0" },
   {
     instructions: `Nankai Trough (南海トラフ地震) earthquake hazard + building-safety engine. Surfaces ONLY official Japanese government data.
 
