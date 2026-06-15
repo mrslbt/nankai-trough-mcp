@@ -6,7 +6,7 @@
  */
 export const SOURCES = {
   cabinetNankai: {
-    name_en: "Cabinet Office — Nankai Trough Mega-Earthquake Model & Damage Assessment Working Group",
+    name_en: "Cabinet Office: Nankai Trough Mega-Earthquake Model & Damage Assessment Working Group",
     name_ja: "内閣府 南海トラフ巨大地震モデル・被害想定検討ワーキンググループ",
     url: "https://www.bousai.go.jp/jishin/nankai/",
   },
@@ -16,17 +16,17 @@ export const SOURCES = {
     url: "https://www.jishin.go.jp/",
   },
   jma: {
-    name_en: "Japan Meteorological Agency (JMA) — Seismic Intensity Scale",
+    name_en: "Japan Meteorological Agency (JMA) Seismic Intensity Scale",
     name_ja: "気象庁 震度階級",
     url: "https://www.jma.go.jp/jma/kishou/know/shindo/index.html",
   },
   mlitTaishin: {
-    name_en: "MLIT — Home Seismic Retrofitting (Sumai no Taishin-ka)",
+    name_en: "MLIT Home Seismic Retrofitting (Sumai no Taishin-ka)",
     name_ja: "国土交通省 住まいの耐震化",
     url: "https://www.mlit.go.jp/jutakukentiku/house/jutakukentiku_house_fr_000043.html",
   },
   jReform: {
-    name_en: "Japan Housing Remodeling Promotion Council — local subsidy search",
+    name_en: "Japan Housing Remodeling Promotion Council, local subsidy search",
     name_ja: "住宅リフォーム推進協議会 地方公共団体支援制度検索",
     url: "https://www.j-reform.com/reform-support/",
   },
@@ -41,7 +41,7 @@ export const SOURCES = {
     url: "https://disaportal.gsi.go.jp/",
   },
   jshis: {
-    name_en: "J-SHIS — National Seismic Hazard Maps (NIED)",
+    name_en: "J-SHIS National Seismic Hazard Maps (NIED)",
     name_ja: "地震ハザードステーション J-SHIS（防災科研）",
     url: "https://www.j-shis.bosai.go.jp/",
   },

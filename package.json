@@ -1,6 +1,6 @@
 {
   "name": "nankai-trough-mcp",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Honest Nankai Trough (南海トラフ地震) earthquake hazard + building-safety engine for AI assistants. Surfaces only official Japanese government data, never a safety verdict.",
   "mcpName": "io.github.mrslbt/nankai-trough",
   "keywords": [
@@ -33,7 +33,7 @@
   "engines": {
     "node": ">=18.0.0"
   },
-  "homepage": "https://github.com/mrslbt/nankai-trough-mcp#readme",
+  "homepage": "https://nankaitrough.bymarsel.me",
   "repository": {
     "type": "git",
     "url": "https://github.com/mrslbt/nankai-trough-mcp.git"

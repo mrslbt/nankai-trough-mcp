@@ -2,7 +2,7 @@ import { SOURCES } from "../data/sources.js";
 
 /**
  * Pure builder for the OFFICIAL per-address hazard-map links. This server never
- * computes intensity/tsunami itself — it points the user at the government maps
+ * computes intensity/tsunami itself; it points the user at the government maps
  * that hold the exact values. Kept pure (no network) so it can be tested.
  */
 export function hazardMapLinks(lat: number, lon: number, zoom = 15) {

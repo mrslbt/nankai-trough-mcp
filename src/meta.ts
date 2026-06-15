@@ -1,6 +1,6 @@
 import type { ToolAnnotations } from "@modelcontextprotocol/sdk/types.js";
 
-/** Pure compute on bundled, verified data — no external calls. */
+/** Pure compute on bundled, verified data, no external calls. */
 export const READONLY: ToolAnnotations = {
   readOnlyHint: true,
   idempotentHint: true,

@@ -59,7 +59,7 @@ test("subsidy routing never quotes an amount and tailors to a location", () => {
   const tokyo = subsidyRoute("高知市");
   assert.ok(generic.search_directory.startsWith("https://"), "must route to a directory URL");
   assert.match(tokyo.how_to_use_ja, /高知市/, "must use the given location in the hint");
-  // Strip URLs first — gov URLs legitimately contain digit runs; we only forbid yen figures.
+  // Strip URLs first. Gov URLs legitimately contain digit runs; we only forbid yen figures.
   const all = JSON.stringify(subsidyRoute("静岡県")).replace(/https?:\/\/[^\s"]+/g, "");
   assert.doesNotMatch(all, /\d+\s*円|¥\s*\d|\d+\s*万/, "subsidy routing must never state a money amount");
 });

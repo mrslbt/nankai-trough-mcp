@@ -7,7 +7,7 @@ import { SOURCES } from "./sources.js";
  * - 新耐震基準 (new seismic standard) took effect 1981-06-01. The boundary is the
  *   建築確認 (building-confirmation) date, NOT completion. 旧耐震 = confirmed on/before
  *   1981-05-31; 新耐震 = confirmed on/after 1981-06-01.  [国土交通省]
- * - 2000年基準: a further strengthening of WOODEN (木造) houses (post-1995 Kobe) —
+ * - 2000年基準: a further strengthening of WOODEN (木造) houses (post-1995 Kobe):
  *   ground-matched foundations, specified joint hardware (金物), balanced load-bearing
  *   wall placement.  [建築基準法 2000 改正]
  * - 2016 Kumamoto earthquake field data (wooden houses): collapse/severe-damage rate
@@ -44,7 +44,7 @@ export const ERA_INFO: Record<Era, { label_en: string; label_ja: string; en: str
     ja: "1981年6月以前の旧耐震基準。国は耐震診断・改修の最優先対象としています。2016年熊本地震では旧耐震の木造の28.2%が倒壊・大破しました。",
   },
   boundary_1981: {
-    label_en: "1981 — boundary year (ambiguous)",
+    label_en: "1981, boundary year (ambiguous)",
     label_ja: "1981年（境界年・要確認）",
     en: "1981 straddles the standard change. Whether it is 旧耐震 or 新耐震 depends on the 建築確認 (building-confirmation) date: on/before 1981-05-31 = old; on/after 1981-06-01 = new. Check the building's 建築確認 date.",
     ja: "1981年は基準改正の境界です。旧耐震か新耐震かは建築確認日で決まります（1981年5月31日以前＝旧、6月1日以降＝新）。建築確認日をご確認ください。",
@@ -52,7 +52,7 @@ export const ERA_INFO: Record<Era, { label_en: string; label_ja: string; en: str
   "1981_2000": {
     label_en: "New standard (新耐震), 1981–2000",
     label_ja: "新耐震（1981〜2000年）",
-    en: "Built to the post-1981 new seismic standard. For wooden houses, the 2016 Kumamoto data showed an 8.7% collapse/severe-damage rate for this era — better than pre-1981, but the 2000 wooden-house standard improved it further.",
+    en: "Built to the post-1981 new seismic standard. For wooden houses, the 2016 Kumamoto data showed an 8.7% collapse/severe-damage rate for this era, better than pre-1981, but the 2000 wooden-house standard improved it further.",
     ja: "1981年以降の新耐震基準。木造では熊本地震で倒壊・大破8.7%（旧耐震より良好）。ただし2000年基準の木造はさらに改善されています。",
   },
   post_2000_wood: {

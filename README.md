@@ -2,24 +2,26 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-**An honest Nankai Trough (南海トラフ地震) earthquake hazard + building-safety engine for AI assistants.** Ask "how bad is the Nankai Trough quake, how far does it reach, and what does that mean for a house built in 1978?" — and get official Japanese government figures, every one cited and dated, with a route to the official maps for your exact address. It never tells you you're "safe."
+**An honest Nankai Trough (南海トラフ地震) earthquake hazard + building-safety engine for AI assistants.** Ask "how bad is the Nankai Trough quake, how far does it reach, and what does that mean for a house built in 1978?" and get official Japanese government figures, every one cited and dated, with a route to the official maps for your exact address. It never tells you you're "safe."
 
-It reports what 内閣府 (Cabinet Office), 地震本部, 気象庁, and 国土交通省 actually publish — and where a figure isn't verifiable, it points you at the source instead of inventing one. Bilingual EN/JA. Runs locally, no API keys.
+It reports what 内閣府 (Cabinet Office), 地震本部, 気象庁, and 国土交通省 actually publish, and where a figure isn't verifiable, it points you at the source instead of inventing one. Bilingual EN/JA. Runs locally, no API keys.
+
+Live companion map: https://nankaitrough.bymarsel.me (this is the open data engine behind it, the same official data as an explorable map).
 
 > **⚠️ Not a prediction, not a verdict.** This explains official data and routes you to official guidance and a professional seismic diagnosis (耐震診断). Always confirm with your municipality and official hazard maps. In an emergency, follow official evacuation instructions.
 
 ## Why it exists
 
-Most people underestimate the *reach*. The 30-year probability was revised by 地震本部 in **September 2025** away from the old single "80%" to a two-model range — **60–90%+ (higher model) / 20–50%** — intensity-7 shaking is projected across **10 prefectures**, and **764 municipalities in 31 prefectures** face major shaking or a 3 m+ tsunami. "I'm inland, so I'm fine" is exactly the assumption this corrects.
+Most people underestimate the *reach*. The 30-year probability was revised by 地震本部 in **September 2025** away from the old single "80%" to a two-model range (**60–90%+ (higher model) / 20–50%**). Intensity-7 shaking is projected across **10 prefectures**, and **764 municipalities in 31 prefectures** face major shaking or a 3 m+ tsunami. "I'm inland, so I'm fine" is exactly the assumption this corrects.
 
-The authoritative data is real, but it's scattered across five agencies and mostly buried in PDFs. This server makes it honest, cited, and usable from an AI assistant — without ever inventing a number.
+The authoritative data is real, but it's scattered across five agencies and mostly buried in PDFs. This server makes it honest, cited, and usable from an AI assistant, without ever inventing a number.
 
 ## The honesty contract
 
 - **No verdicts.** It reports official figures + plain-language meaning, never "your home is safe/unsafe."
 - **Every figure cites its official source + date.** If a value isn't verifiable in a primary source, it points to the source instead of guessing.
 - **Probabilistic ≠ scenario.** J-SHIS (all-source probability) is never presented as the Nankai scenario (Cabinet Office).
-- **Building safety can't be looked up** — it's classified from the build year + structure *you* provide. No fabricated per-building data.
+- **Building safety can't be looked up.** It's classified from the build year + structure *you* provide. No fabricated per-building data.
 
 ## Install
 
@@ -32,7 +34,7 @@ claude mcp add nankai -- npx -y nankai-trough-mcp
 The server config is the same across clients; only the file path differs.
 
 <details>
-<summary>Claude Code — <code>~/.claude/.mcp.json</code></summary>
+<summary>Claude Code: <code>~/.claude/.mcp.json</code></summary>
 
 ```json
 {
@@ -45,7 +47,7 @@ The server config is the same across clients; only the file path differs.
 </details>
 
 <details>
-<summary>Cursor — <code>~/.cursor/mcp.json</code></summary>
+<summary>Cursor: <code>~/.cursor/mcp.json</code></summary>
 
 ```json
 {
@@ -58,7 +60,7 @@ The server config is the same across clients; only the file path differs.
 </details>
 
 <details>
-<summary>VS Code (GitHub Copilot) — <code>.vscode/mcp.json</code></summary>
+<summary>VS Code (GitHub Copilot): <code>.vscode/mcp.json</code></summary>
 
 ```json
 {
@@ -71,7 +73,7 @@ The server config is the same across clients; only the file path differs.
 </details>
 
 <details>
-<summary>Claude Desktop — <code>claude_desktop_config.json</code></summary>
+<summary>Claude Desktop: <code>claude_desktop_config.json</code></summary>
 
 ```json
 {
@@ -105,7 +107,7 @@ Point the client config at the built entry:
 
 | Tool | Description |
 |---|---|
-| `nankai_overview` | The official 2025 scenario's scale and reach — probability, casualties, intensity-7 reach, tsunami — each with its source. Start here. |
+| `nankai_overview` | The official 2025 scenario's scale and reach (probability, casualties, intensity-7 reach, tsunami), each with its source. Start here. |
 | `official_hazard_maps` | Address → links to the **official** per-address hazard maps, where the exact predicted intensity and tsunami live. This server bridges; it doesn't invent those numbers. |
 | `building_seismic_check` | Build year + structure → 旧耐震 / 新耐震 / 2000-standard classification with honest context. Not a verdict. |
 | `taishin_subsidy_guide` | Routes to subsidised, often-free 耐震診断 / 耐震補強 programs and the national support framework. |
@@ -120,15 +122,15 @@ Read-only reference documents a client can list and read without a tool call. Ea
 
 | Resource | Content |
 |---|---|
-| `nankai://sources` | The official source registry — every agency cited, with URL, plus the standing disclaimer. |
+| `nankai://sources` | The official source registry: every agency cited, with URL, plus the standing disclaimer. |
 | `nankai://headline-figures` | The 2025 scenario's headline figures, each with source, as-of date, and notes. |
-| `nankai://shindo-scale` | The JMA intensity scale (震度 5弱–7) — what each level means for people and buildings. |
+| `nankai://shindo-scale` | The JMA intensity scale (震度 5弱–7): what each level means for people and buildings. |
 | `nankai://building-standards` | The 1981 新耐震 / 2000 wooden-house boundaries + 2016 Kumamoto field-damage data. |
 
 ## Example prompts
 
 ```
-Brief me on the Nankai Trough earthquake — the scale, the reach, and what
+Brief me on the Nankai Trough earthquake: the scale, the reach, and what
 intensity 7 actually means for a building.
 ```
 
@@ -147,7 +149,7 @@ Walk me through honestly assessing my home's earthquake risk:
 静岡市葵区追手町9-6, built 1990, reinforced concrete.
 ```
 
-## Scope — v1 vs v2
+## Scope: v1 vs v2
 
 **v1 (this) does not compute a per-address Nankai intensity/tsunami value.** That data lives in bulk Cabinet Office GIS files that need an ingestion pipeline. Instead, `official_hazard_maps` bridges you to the official maps that already hold it. Computing it in-app is the deliberate **v2**.
 
@@ -176,7 +178,7 @@ Official data is used as **derived output with attribution**; raw government fil
 
 ## Disclaimer
 
-This server surfaces official Japanese government data and explanations. It is not a prediction, not a verdict on whether you or your home are safe, and not a substitute for official evacuation guidance or a professional seismic diagnosis (耐震診断). Figures are approximate and as reported by their official sources; always confirm at the source. Unofficial — not affiliated with any government agency.
+This server surfaces official Japanese government data and explanations. It is not a prediction, not a verdict on whether you or your home are safe, and not a substitute for official evacuation guidance or a professional seismic diagnosis (耐震診断). Figures are approximate and as reported by their official sources; always confirm at the source. Unofficial, not affiliated with any government agency.
 
 ## License
 

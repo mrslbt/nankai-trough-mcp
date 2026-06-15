@@ -2,16 +2,17 @@
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.mrslbt/nankai-trough",
   "description": "Nankai Trough earthquake hazard & building-safety, from official Japan data. No verdicts.",
+  "websiteUrl": "https://nankaitrough.bymarsel.me",
   "repository": {
     "url": "https://github.com/mrslbt/nankai-trough-mcp",
     "source": "github"
   },
-  "version": "0.1.0",
+  "version": "0.1.1",
   "packages": [
     {
       "registryType": "npm",
       "identifier": "nankai-trough-mcp",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "transport": {
         "type": "stdio"
       }

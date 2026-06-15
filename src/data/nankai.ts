@@ -12,9 +12,9 @@ import { SOURCES } from "./sources.js";
  * - Economic loss: primary headline ≈ ¥270兆 (直接224.9兆 + 生産低下45.4兆); ~¥292兆 is the
  *   with-transport-disruption sum reported by official-adjacent press.
  * - Intensity 7: VERIFIED in 10 named prefectures. (The "149 municipalities" figure could
- *   NOT be confirmed in any primary PDF — dropped. Verified reach = 31 prefectures /
+ *   NOT be confirmed in any primary PDF, so it was dropped. Verified reach = 31 prefectures /
  *   764 municipalities at 震度6弱以上 or 津波3m以上.)
- * - 30-yr probability: REVISED 2025-09-26 — no longer a single "80%"; two models now.
+ * - 30-yr probability: REVISED 2025-09-26, no longer a single "80%"; two models now.
  * - Tsunami: fastest coasts 5m+ within minutes; max ~34m (高知県).
  */
 export interface NankaiFact {
@@ -77,8 +77,8 @@ export const NANKAI_FACTS: NankaiFact[] = [
   },
   {
     key: "tsunami",
-    en: "Tsunami — speed and height",
-    ja: "津波 — 速さと高さ",
+    en: "Tsunami: speed and height",
+    ja: "津波：速さと高さ",
     value:
       "On the fastest coasts (e.g. Suruga Bay) a tsunami over 5 m can arrive within a few minutes. Maximum heights reach ~34 m (Kochi) and ~31 m (Shizuoka); 10 m+ is expected along wide Pacific coasts from Kanto to Kyushu (JMA).",
     source: SOURCES.cabinetNankai,
@@ -91,13 +91,13 @@ export const NANKAI_FACTS: NankaiFact[] = [
     value:
       "A wide designated region spanning Pacific-side prefectures from the Kanto/Tokai area through Kinki, Shikoku and Kyushu. Check whether your municipality is included.",
     source: SOURCES.cabinetNankai,
-    asOf: "current",
+    asOf: "2026-06 (current designation)",
   },
 ];
 
 export const NANKAI_REACH_NOTE = {
   en:
-    "The most-underestimated fact: the Nankai Trough quake reaches far beyond the immediate coast — intensity-7 shaking is projected across 10 prefectures, and 764 municipalities in 31 prefectures face intensity 6-lower+ or a 3 m+ tsunami. 'I'm inland, so I'm fine' is exactly the assumption this data corrects.",
+    "The most-underestimated fact: the Nankai Trough quake reaches far beyond the immediate coast. Intensity-7 shaking is projected across 10 prefectures, and 764 municipalities in 31 prefectures face intensity 6-lower+ or a 3 m+ tsunami. 'I'm inland, so I'm fine' is exactly the assumption this data corrects.",
   ja:
     "最も過小評価されがちな事実：南海トラフ地震の影響は沿岸部だけにとどまりません。震度7は10県に想定され、震度6弱以上または3m以上の津波の影響を受けるのは31都府県・764市町村に及びます。「内陸だから大丈夫」という思い込みこそ、このデータが正すものです。",
 };

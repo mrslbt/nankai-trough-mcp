@@ -2,7 +2,7 @@ import { SOURCES } from "./sources.js";
 
 /**
  * Seismic diagnosis (耐震診断) / retrofit (耐震補強) support framework.
- * Programs and amounts vary by municipality — we route to the national directory
+ * Programs and amounts vary by municipality, so we route to the national directory
  * and explain the framework, and we NEVER state a specific subsidy amount (it is
  * city-dependent). Source: MLIT 住まいの耐震化 + 住宅リフォーム推進協議会.
  */

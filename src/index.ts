@@ -27,24 +27,24 @@ const LANG = z
   .meta({ title: "Language" });
 
 const server = new McpServer(
-  { name: "nankai-trough-mcp", version: "0.1.0" },
+  { name: "nankai-trough-mcp", version: "0.1.1" },
   {
     instructions: `Nankai Trough (南海トラフ地震) earthquake hazard + building-safety engine. Surfaces ONLY official Japanese government data.
 
-ABSOLUTE RULES when using these tools — state them to the user:
+ABSOLUTE RULES when using these tools, state them to the user:
 1. NEVER tell the user their area or home is "safe" or "unsafe." Report the official numbers + plain-language meaning, and route to official guidance. There is no verdict.
 2. Always pass through the disclaimer the tools return, and cite the official source for every figure.
 3. This server does NOT compute a per-address Nankai intensity/tsunami value. For that, use official_hazard_maps to bridge the user to the official government maps that do.
 4. Distinguish probabilistic data (J-SHIS, all-source) from the Nankai SCENARIO (Cabinet Office). Never present one as the other.
-5. Building safety cannot be looked up — building_seismic_check uses the year/structure the USER provides.
+5. Building safety cannot be looked up. building_seismic_check uses the year/structure the USER provides.
 
 Tool guide:
-- nankai_overview — the scale and reach of the 2025 official estimate. Start here.
-- official_hazard_maps — address → links to the official per-address hazard maps (the bridge for exact intensity/tsunami).
-- building_seismic_check — user's build year + structure → honest seismic-standard classification. NOT a verdict.
-- taishin_subsidy_guide — route to subsidised 耐震診断/補強 (the real action).
-- shindo_meaning — what a JMA intensity (震度) level means.
-- geocode_address — address → coordinates (utility, GSI).
+- nankai_overview: the scale and reach of the 2025 official estimate. Start here.
+- official_hazard_maps: address → links to the official per-address hazard maps (the bridge for exact intensity/tsunami).
+- building_seismic_check: user's build year + structure → honest seismic-standard classification. NOT a verdict.
+- taishin_subsidy_guide: route to subsidised 耐震診断/補強 (the real action).
+- shindo_meaning: what a JMA intensity (震度) level means.
+- geocode_address: address → coordinates (utility, GSI).
 
 All tools are read-only. ${ATTRIBUTION}`,
   }
@@ -83,7 +83,7 @@ server.registerTool(
   {
     title: "Official Hazard Maps for an Address",
     description:
-      "Geocode a Japanese address and return links to the OFFICIAL government hazard maps that hold the exact per-address values (predicted intensity, tsunami inundation, your municipal map). This server does not compute those itself — it bridges you to the authoritative source.",
+      "Geocode a Japanese address and return links to the OFFICIAL government hazard maps that hold the exact per-address values (predicted intensity, tsunami inundation, your municipal map). This server does not compute those itself; it bridges you to the authoritative source.",
     inputSchema: {
       address: z
         .string()
@@ -105,7 +105,7 @@ server.registerTool(
             language
           ),
           ...hazardMapLinks(g.lat, g.lon),
-          national_overlay_map_how: language === "ja" ? "重ねるハザードマップ。「津波」レイヤーを有効にしてください。" : "Kasaneru Hazard Map — enable the '津波' (tsunami) layer.",
+          national_overlay_map_how: language === "ja" ? "重ねるハザードマップ。「津波」レイヤーを有効にしてください。" : "Kasaneru Hazard Map. Enable the '津波' (tsunami) layer.",
         },
         ...disc(language),
         attribution: `${SOURCES.gsi.name_en} (geocoding) · ${SOURCES.disaportal.name_en} · ${SOURCES.jshis.name_en} · ${SOURCES.cabinetNankai.name_en}`,
@@ -122,14 +122,14 @@ server.registerTool(
   {
     title: "Building Seismic-Standard Check",
     description:
-      "Classify a building's seismic standard (旧耐震 / 新耐震 / 2000 wooden standard) from a build year and structure the USER provides, with honest risk context. This is NOT a safety verdict — direct the user to a professional 耐震診断 via taishin_subsidy_guide.",
+      "Classify a building's seismic standard (旧耐震 / 新耐震 / 2000 wooden standard) from a build year and structure the USER provides, with honest risk context. This is NOT a safety verdict; direct the user to a professional 耐震診断 via taishin_subsidy_guide.",
     inputSchema: {
       build_year: z
         .number()
         .int()
         .min(1900)
         .max(2100)
-        .describe("Year the building's 建築確認 (building confirmation) was issued — roughly its build year.")
+        .describe("Year the building's 建築確認 (building confirmation) was issued, roughly its build year.")
         .meta({ title: "Build Year" }),
       structure: z
         .enum(["wood", "reinforced_concrete", "steel", "other"])
@@ -147,7 +147,7 @@ server.registerTool(
       classification: language === "ja" ? info.label_ja : info.label_en,
       what_it_means: bi(info.en, info.ja, language),
       not_a_verdict: bi(
-        "This is the standard era only — not a verdict on whether the building is safe. Only a professional 耐震診断 (seismic diagnosis) can assess this building. See taishin_subsidy_guide for subsidised diagnosis.",
+        "This is the standard era only, not a verdict on whether the building is safe. Only a professional 耐震診断 (seismic diagnosis) can assess this building. See taishin_subsidy_guide for subsidised diagnosis.",
         "これは耐震基準の世代であり、建物が安全かどうかの判定ではありません。実際の評価は専門家の耐震診断のみで可能です。補助制度は taishin_subsidy_guide をご覧ください。",
         language
       ),
@@ -172,7 +172,7 @@ server.registerTool(
   {
     title: "Seismic Diagnosis & Retrofit Subsidy Guide",
     description:
-      "Route the user to subsidised/often-free seismic diagnosis (耐震診断) and retrofit (耐震補強) programs via the national directory, and explain the support framework. Amounts vary by municipality, so this routes and explains — it never quotes a figure.",
+      "Route the user to subsidised/often-free seismic diagnosis (耐震診断) and retrofit (耐震補強) programs via the national directory, and explain the support framework. Amounts vary by municipality, so this routes and explains; it never quotes a figure.",
     inputSchema: {
       location: z
         .string()
@@ -264,7 +264,7 @@ server.registerPrompt(
         role: "user",
         content: {
           type: "text",
-          text: `Help me honestly understand the Nankai Trough earthquake risk for my home at "${address}" (built ${build_year}, ${structure}).\n\nDo this, and DO NOT tell me I'm "safe" or "unsafe":\n1. nankai_overview — the scale and reach.\n2. official_hazard_maps with my address — give me the official maps for my exact predicted shaking and tsunami.\n3. building_seismic_check with build_year=${build_year}, structure=${structure} — my building's standard, honestly.\n4. taishin_subsidy_guide for my municipality — the subsidised 耐震診断 I should get.\n\nPass through every source and disclaimer.`,
+          text: `Help me honestly understand the Nankai Trough earthquake risk for my home at "${address}" (built ${build_year}, ${structure}).\n\nDo this, and DO NOT tell me I'm "safe" or "unsafe":\n1. nankai_overview for the scale and reach.\n2. official_hazard_maps with my address, give me the official maps for my exact predicted shaking and tsunami.\n3. building_seismic_check with build_year=${build_year}, structure=${structure}, my building's standard, honestly.\n4. taishin_subsidy_guide for my municipality, the subsidised 耐震診断 I should get.\n\nPass through every source and disclaimer.`,
         },
       },
     ],
