@@ -2,7 +2,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-**An honest Nankai Trough (南海トラフ地震) earthquake hazard + building-safety engine for AI assistants.** Ask "how bad is the Nankai Trough quake, how far does it reach, and what does that mean for a house built in 1978?" and get official Japanese government figures, every one cited and dated, with a route to the official maps for your exact address. It never tells you you're "safe."
+**Nankai Trough (南海トラフ地震) earthquake hazard and building-safety engine for AI assistants.** Ask "how bad is the Nankai Trough quake, how far does it reach, and what does that mean for a house built in 1978?" and get official Japanese government figures, every one cited and dated, with a route to the official maps for your exact address. It never tells you you're "safe."
 
 It reports what 内閣府 (Cabinet Office), 地震本部, 気象庁, and 国土交通省 actually publish, and where a figure isn't verifiable, it points you at the source instead of inventing one. Bilingual EN/JA. Runs locally, no API keys.
 
@@ -14,9 +14,9 @@ Live companion map: https://nankaitrough.bymarsel.me (this is the open data engi
 
 Most people underestimate the *reach*. The 30-year probability was revised by 地震本部 in **September 2025** away from the old single "80%" to a two-model range (**60–90%+ (higher model) / 20–50%**). Intensity-7 shaking is projected across **10 prefectures**, and **764 municipalities in 31 prefectures** face major shaking or a 3 m+ tsunami. "I'm inland, so I'm fine" is exactly the assumption this corrects.
 
-The authoritative data is real, but it's scattered across five agencies and mostly buried in PDFs. This server makes it honest, cited, and usable from an AI assistant, without ever inventing a number.
+The authoritative data is real, but it's scattered across five agencies and mostly buried in PDFs. This server makes it cited and usable from an AI assistant, without ever inventing a number.
 
-## The honesty contract
+## Data rules
 
 - **No verdicts.** It reports official figures + plain-language meaning, never "your home is safe/unsafe."
 - **Every figure cites its official source + date.** If a value isn't verifiable in a primary source, it points to the source instead of guessing.
@@ -109,7 +109,7 @@ Point the client config at the built entry:
 |---|---|
 | `nankai_overview` | The official 2025 scenario's scale and reach (probability, casualties, intensity-7 reach, tsunami), each with its source. Start here. |
 | `official_hazard_maps` | Address → links to the **official** per-address hazard maps, where the exact predicted intensity and tsunami live. This server bridges; it doesn't invent those numbers. |
-| `building_seismic_check` | Build year + structure → 旧耐震 / 新耐震 / 2000-standard classification with honest context. Not a verdict. |
+| `building_seismic_check` | Build year + structure → 旧耐震 / 新耐震 / 2000-standard classification with context. Not a verdict. |
 | `taishin_subsidy_guide` | Routes to subsidised, often-free 耐震診断 / 耐震補強 programs and the national support framework. |
 | `shindo_meaning` | What a JMA intensity (震度 5弱–7) means for people and buildings, on the official 気象庁 scale. |
 | `geocode_address` | Address → coordinates via the GSI geocoder. Utility. |
@@ -145,7 +145,7 @@ and what should I do about it? Don't tell me whether it's safe.
 ```
 
 ```
-Walk me through honestly assessing my home's earthquake risk:
+Walk me through assessing my home's earthquake risk:
 静岡市葵区追手町9-6, built 1990, reinforced concrete.
 ```
 
@@ -174,7 +174,7 @@ Official data is used as **derived output with attribution**; raw government fil
 
 ## 日本語
 
-南海トラフ地震のハザードと建物の耐震性を、公的データだけで正直に扱うMCPサーバーです。内閣府・地震本部・気象庁・国土交通省の公表値を、出典と日付つきで提示し、あなたの住所の正確な想定震度・津波は公式ハザードマップへ橋渡しします。建物の安全性は「安全／危険」と判定せず、建築年と構造から耐震基準の世代を示し、耐震診断・補助制度へ案内します。ローカル動作、APIキー不要。
+南海トラフ地震のハザードと建物の耐震性を、公的データだけで扱うMCPサーバーです。内閣府・地震本部・気象庁・国土交通省の公表値を、出典と日付つきで提示し、あなたの住所の正確な想定震度・津波は公式ハザードマップへ橋渡しします。建物の安全性は「安全／危険」と判定せず、建築年と構造から耐震基準の世代を示し、耐震診断・補助制度へ案内します。ローカル動作、APIキー不要。
 
 ## Disclaimer
 

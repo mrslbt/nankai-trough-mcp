@@ -41,7 +41,7 @@ ABSOLUTE RULES when using these tools, state them to the user:
 Tool guide:
 - nankai_overview: the scale and reach of the 2025 official estimate. Start here.
 - official_hazard_maps: address → links to the official per-address hazard maps (the bridge for exact intensity/tsunami).
-- building_seismic_check: user's build year + structure → honest seismic-standard classification. NOT a verdict.
+- building_seismic_check: user's build year + structure → seismic-standard classification. NOT a verdict.
 - taishin_subsidy_guide: route to subsidised 耐震診断/補強 (the real action).
 - shindo_meaning: what a JMA intensity (震度) level means.
 - geocode_address: address → coordinates (utility, GSI).
@@ -122,7 +122,7 @@ server.registerTool(
   {
     title: "Building Seismic-Standard Check",
     description:
-      "Classify a building's seismic standard (旧耐震 / 新耐震 / 2000 wooden standard) from a build year and structure the USER provides, with honest risk context. This is NOT a safety verdict; direct the user to a professional 耐震診断 via taishin_subsidy_guide.",
+      "Classify a building's seismic standard (旧耐震 / 新耐震 / 2000 wooden standard) from a build year and structure the USER provides, with risk context. This is NOT a safety verdict; direct the user to a professional 耐震診断 via taishin_subsidy_guide.",
     inputSchema: {
       build_year: z
         .number()
@@ -250,8 +250,8 @@ server.registerTool(
 server.registerPrompt(
   "assess_home_earthquake_risk",
   {
-    title: "Assess my home's earthquake risk (honestly)",
-    description: "Guided, honest walkthrough: scale → official maps → building standard → subsidy. Never a verdict.",
+    title: "Assess my home's earthquake risk",
+    description: "Guided walkthrough: scale, then the official maps, building standard, and subsidy. Never a verdict.",
     argsSchema: {
       address: z.string().describe("Japanese address of the home"),
       build_year: z.string().describe("Build year (建築確認), e.g. 1990"),
@@ -264,7 +264,7 @@ server.registerPrompt(
         role: "user",
         content: {
           type: "text",
-          text: `Help me honestly understand the Nankai Trough earthquake risk for my home at "${address}" (built ${build_year}, ${structure}).\n\nDo this, and DO NOT tell me I'm "safe" or "unsafe":\n1. nankai_overview for the scale and reach.\n2. official_hazard_maps with my address, give me the official maps for my exact predicted shaking and tsunami.\n3. building_seismic_check with build_year=${build_year}, structure=${structure}, my building's standard, honestly.\n4. taishin_subsidy_guide for my municipality, the subsidised 耐震診断 I should get.\n\nPass through every source and disclaimer.`,
+          text: `Help me understand the Nankai Trough earthquake risk for my home at "${address}" (built ${build_year}, ${structure}).\n\nDo this, and DO NOT tell me I'm "safe" or "unsafe":\n1. nankai_overview for the scale and reach.\n2. official_hazard_maps with my address, give me the official maps for my exact predicted shaking and tsunami.\n3. building_seismic_check with build_year=${build_year}, structure=${structure}, for my building's standard.\n4. taishin_subsidy_guide for my municipality, the subsidised 耐震診断 I should get.\n\nPass through every source and disclaimer.`,
         },
       },
     ],

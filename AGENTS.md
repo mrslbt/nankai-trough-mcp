@@ -42,7 +42,7 @@ src/
     └── cache.ts        # getOrFetch + TTL
 ```
 
-The SDK is `@modelcontextprotocol/sdk` (1.29+), zod 4. Annotations are honest about reach: pure-compute tools use `READONLY` (`openWorldHint: false`); anything that calls the GSI geocoder uses `READONLY_EXTERNAL` (`openWorldHint: true`).
+The SDK is `@modelcontextprotocol/sdk` (1.29+), zod 4. Annotations match each tool's actual reach: pure-compute tools use `READONLY` (`openWorldHint: false`); anything that calls the GSI geocoder uses `READONLY_EXTERNAL` (`openWorldHint: true`).
 
 ## How to add or change a tool
 
@@ -66,7 +66,7 @@ server.registerTool(
 
 Keep tool logic thin in `index.ts`; put data in `src/data/<name>.ts` and shared helpers in `src/lib/`. Then update the expected-tools list in `test/smoke.mjs` and run `npm test && npm run smoke`.
 
-## The honesty rule (non-negotiable; it's the whole point)
+## The data rules (non-negotiable, the whole point)
 
 This is a life-safety topic. A single fabricated number breaks the server. Five rules, no exceptions:
 
