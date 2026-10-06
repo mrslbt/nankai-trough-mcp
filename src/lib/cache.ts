@@ -3,6 +3,7 @@ const store = new Map<string, CacheEntry<unknown>>();
 
 export const TTL = {
   GEOCODE: 30 * 24 * 60 * 60 * 1000, // 30 days; an address's coordinates don't move
+  JSHIS: 24 * 60 * 60 * 1000,        // 24 hours; J-SHIS publishes a new model yearly
 };
 
 export async function getOrFetch<T>(key: string, ttlMs: number, fn: () => Promise<T>): Promise<T> {

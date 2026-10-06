@@ -1,6 +1,6 @@
 {
   "name": "nankai-trough-mcp",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Nankai Trough (南海トラフ地震) earthquake hazard and building-safety for AI assistants. Official Japanese government figures, cited and dated, never a safety verdict.",
   "mcpName": "io.github.mrslbt/nankai-trough",
   "keywords": [
@@ -43,7 +43,8 @@
     "start": "node dist/index.js",
     "dev": "tsc --watch",
     "test": "npm run build && node --test test/*.test.mjs",
-    "smoke": "npm run build && node test/smoke.mjs"
+    "smoke": "npm run build && node test/smoke.mjs",
+    "acceptance": "npm run build && node test/acceptance.mjs"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.29.0",

@@ -9,6 +9,8 @@ import { NANKAI_FACTS, NANKAI_REACH_NOTE } from "./data/nankai.js";
 import { classifyEra, ERA_INFO, KUMAMOTO_WOOD, type Structure } from "./data/building.js";
 import { SHINDO, SHINDO_SOURCE, type Shindo } from "./data/shindo.js";
 import { SUBSIDY_FRAMEWORK, subsidyRoute } from "./data/subsidy.js";
+import { jshisProbabilities, pct, FLOOR_NOT_CEILING, PROBABILISTIC_NOT_SCENARIO, JSHIS_SOURCE, JSHIS_VERSION } from "./data/jshis.js";
+import { stockpile, NOW_STEPS, WHEN_IT_SHAKES, COASTAL_UNKNOWN, PLAN_IS_NOT_A_VERDICT, STOCKPILE_SOURCE, QUANTITY_SOURCE, DAYS } from "./data/prepare.js";
 import { geocode } from "./lib/geocode.js";
 import { hazardMapLinks } from "./lib/maps.js";
 import { RESOURCES } from "./resources.js";
@@ -27,16 +29,18 @@ const LANG = z
   .meta({ title: "Language" });
 
 const server = new McpServer(
-  { name: "nankai-trough-mcp", version: "0.1.1" },
+  { name: "nankai-trough-mcp", version: "0.2.0" },
   {
     instructions: `Nankai Trough (南海トラフ地震) earthquake hazard + building-safety engine. Surfaces ONLY official Japanese government data.
 
 ABSOLUTE RULES when using these tools, state them to the user:
 1. NEVER tell the user their area or home is "safe" or "unsafe." Report the official numbers + plain-language meaning, and route to official guidance. There is no verdict.
 2. Always pass through the disclaimer the tools return, and cite the official source for every figure.
-3. This server does NOT compute a per-address Nankai intensity/tsunami value. For that, use official_hazard_maps to bridge the user to the official government maps that do.
+3. This server does NOT compute its own per-address values. It can REPORT official published per-mesh probabilities (location_probability, J-SHIS) and it bridges to the official maps for the Nankai scenario (official_hazard_maps).
 4. Distinguish probabilistic data (J-SHIS, all-source) from the Nankai SCENARIO (Cabinet Office). Never present one as the other.
 5. Building safety cannot be looked up. building_seismic_check uses the year/structure the USER provides.
+6. Users who cannot write Japanese can give a 7-digit postal code instead of an address; the tools resolve it via Japan Post data and report the reduced precision. Never turn someone away for not writing kanji.
+7. ASSUME THE WORST. Where official data offers several cases, lead with the severe one. A low probability is a floor, not a ceiling, and must never be relayed as reassurance.
 
 Tool guide:
 - nankai_overview: the scale and reach of the 2025 official estimate. Start here.
@@ -44,6 +48,8 @@ Tool guide:
 - building_seismic_check: user's build year + structure → seismic-standard classification. NOT a verdict.
 - taishin_subsidy_guide: route to subsidised 耐震診断/補強 (the real action).
 - shindo_meaning: what a JMA intensity (震度) level means.
+- location_probability: address → OFFICIAL J-SHIS 30-year probabilities for that mesh (probabilistic, not the Nankai scenario).
+- preparedness_plan: household details → sourced checklist of what to do now, and when it shakes.
 - geocode_address: address → coordinates (utility, GSI).
 
 All tools are read-only. ${ATTRIBUTION}`,
@@ -87,7 +93,7 @@ server.registerTool(
     inputSchema: {
       address: z
         .string()
-        .describe("Japanese address, e.g. '静岡県静岡市葵区追手町9-6' or '高知市本町5'.")
+        .describe("Japanese address, or a 7-digit postal code if you cannot type Japanese. e.g. '静岡県静岡市葵区追手町9-6' or '232-0063'.")
         .meta({ title: "Address" }),
       language: LANG,
     },
@@ -97,7 +103,7 @@ server.registerTool(
     try {
       const g = await geocode(address);
       return ok({
-        location: { lat: g.lat, lon: g.lon, normalized: g.normalized, prefecture: g.prefecture, municipality: g.municipality },
+        location: { lat: g.lat, lon: g.lon, normalized: g.normalized, prefecture: g.prefecture, municipality: g.municipality, resolved_via: g.resolved_via, ...(g.postal_code ? { postal_code: g.postal_code } : {}) },
         exact_values_live_here: {
           ...bi(
             "Open these official maps for your address's exact predicted shaking and tsunami. This MCP intentionally does not invent those numbers.",
@@ -215,7 +221,13 @@ server.registerTool(
   async ({ shindo, language }) => {
     const s = SHINDO[shindo as Shindo];
     return ok({
-      intensity: s.ja_label,
+      intensity:
+        language === "ja" ? s.ja_label : `JMA intensity ${s.en_label}${language === "both" ? ` (${s.ja_label})` : ""}`,
+      scale_note: bi(
+        "The JMA intensity scale is not magnitude. It measures shaking where you are, and levels 5 and 6 each split into lower and upper.",
+        "震度はマグニチュードではなく、その場所での揺れの強さです。5と6にはそれぞれ弱と強があります。",
+        language
+      ),
       meaning: bi(s.en, s.ja, language),
       source: language === "ja" ? SHINDO_SOURCE.name_ja : SHINDO_SOURCE.name_en,
       source_url: SHINDO_SOURCE.url,
@@ -232,7 +244,7 @@ server.registerTool(
     description:
       "Convert a Japanese address to coordinates (lat/lon) and parse the prefecture/municipality, via the official GSI geocoder. Utility used by official_hazard_maps; call it directly when you only need coordinates.",
     inputSchema: {
-      address: z.string().describe("Japanese address to geocode.").meta({ title: "Address" }),
+      address: z.string().describe("Japanese address, or a 7-digit postal code (e.g. 232-0063) if you cannot type Japanese.").meta({ title: "Address" }),
     },
     annotations: READONLY_EXTERNAL,
   },
@@ -243,6 +255,147 @@ server.registerTool(
     } catch (err) {
       return fail(`Geocode failed for "${address}": ${err instanceof Error ? err.message : String(err)}`);
     }
+  }
+);
+
+// ── 7. location_probability (official J-SHIS per-mesh, severe case first) ──
+server.registerTool(
+  "location_probability",
+  {
+    title: "Official 30-Year Probabilities for a Location",
+    description:
+      "Report the OFFICIAL J-SHIS 30-year probabilities of reaching each JMA intensity at an address's ~250m mesh, severe case first. These are all-source probabilistic figures published by 地震本部, NOT the Nankai Trough scenario, and they are floors rather than ceilings. This server reports these official values; it does not compute its own.",
+    inputSchema: {
+      address: z
+        .string()
+        .describe("Japanese address, or a 7-digit postal code if you cannot type Japanese. e.g. '東京都港区赤坂9-7-1', '高知市本町5', or '232-0063'.")
+        .meta({ title: "Address" }),
+      language: LANG,
+    },
+    annotations: READONLY_EXTERNAL,
+  },
+  async ({ address, language }) => {
+    try {
+      const g = await geocode(address);
+      const j = await jshisProbabilities(g.lat, g.lon);
+      const probabilities = j.bands.map((b) => ({
+        at_least:
+          language === "ja"
+            ? `${b.ja_label}以上`
+            : `JMA intensity ${b.en_label} or greater${language === "both" ? ` (${b.ja_label}以上)` : ""}`,
+        max_case: pct(b.probability_30yr_max),
+        average_case: pct(b.probability_30yr_avg),
+        what_it_feels_like: bi(SHINDO[b.shindo].en, SHINDO[b.shindo].ja, language),
+      }));
+      return ok({
+        location: { lat: g.lat, lon: g.lon, normalized: g.normalized, prefecture: g.prefecture, municipality: g.municipality, resolved_via: g.resolved_via, ...(g.postal_code ? { postal_code: g.postal_code } : {}) },
+        mesh: { meshcode: j.meshcode, model_version: j.version, cases_returned: j.cases_returned },
+        ...(g.resolved_via === "postal_code"
+          ? {
+              precision: bi(
+                `Resolved from postal code ${g.postal_code} to the centre of ${g.normalized}, not to your exact building. Shaking can differ across a postal district, so treat this mesh as indicative and check the official map for the building itself.`,
+                `郵便番号 ${g.postal_code} から ${g.normalized} の代表地点として求めた結果で、建物単位ではありません。同じ郵便番号内でも揺れは異なるため、建物ごとの確認は公式ハザードマップで行ってください。`,
+                language
+              ),
+            }
+          : {}),
+        probabilities_within_30_years: probabilities,
+        reading_order: bi(
+          "Read the maximum case first. Where the official model gives more than one case, the severe one is the planning number.",
+          "まず最大ケースを見てください。公的モデルが複数のケースを示す場合、計画の基準にすべきは深刻なほうです。",
+          language
+        ),
+        floor_not_ceiling: bi(FLOOR_NOT_CEILING.en, FLOOR_NOT_CEILING.ja, language),
+        what_this_is_not: bi(PROBABILISTIC_NOT_SCENARIO.en, PROBABILISTIC_NOT_SCENARIO.ja, language),
+        next: "For the Nankai Trough scenario at this address, call official_hazard_maps. For what to do about it, call preparedness_plan.",
+        ...disc(language),
+        attribution: `${JSHIS_SOURCE.name_en} ${JSHIS_VERSION} · ${SOURCES.herp.name_en} · ${SOURCES.gsi.name_en} (geocoding)`,
+      });
+    } catch (err) {
+      return fail(
+        `Could not read official probabilities for "${address}": ${err instanceof Error ? err.message : String(err)}. J-SHIS covers Japan only. You can query it directly at ${JSHIS_SOURCE.url}`
+      );
+    }
+  }
+);
+
+// ── 8. preparedness_plan (the action layer) ───────────────────────────
+server.registerTool(
+  "preparedness_plan",
+  {
+    title: "Preparedness Plan for a Household",
+    description:
+      "Turn household details into a sourced preparedness plan: stockpile quantities sized to the official one-week guidance, what to do now, what to do when it shakes, and the structural route if a build year is given. Officially recommended minimums, never a verdict on survival.",
+    inputSchema: {
+      adults: z.number().int().min(1).describe("Number of adults in the household.").meta({ title: "Adults" }),
+      children: z.number().int().min(0).optional().describe("Number of children.").meta({ title: "Children" }),
+      elderly: z.number().int().min(0).optional().describe("Number of elderly members, or members needing assistance to evacuate.").meta({ title: "Elderly" }),
+      floor: z.number().int().optional().describe("Which floor the home is on.").meta({ title: "Floor" }),
+      building_year: z.number().int().optional().describe("Year of 建築確認 (building confirmation), if known.").meta({ title: "Build year" }),
+      structure: z
+        .enum(["wood", "reinforced_concrete", "steel", "other", "unknown"])
+        .default("unknown")
+        .describe("Building structure: wood (木造), reinforced_concrete (RC), steel (鉄骨), other, or unknown.")
+        .meta({ title: "Structure" }),
+      near_coast_or_river: z.enum(["yes", "no", "unknown"]).default("unknown").describe("Near the coast or a river mouth?").meta({ title: "Coastal" }),
+      language: LANG,
+    },
+    annotations: READONLY,
+  },
+  async ({ adults, children, elderly, floor, building_year, structure, near_coast_or_river, language }) => {
+    const supplies = stockpile({ adults, children, elderly, floor });
+    const coastal = near_coast_or_river;
+
+    const structural =
+      building_year !== undefined
+        ? (() => {
+            // Unknown structure resolves to "wood": it is the least favourable
+            // classification for a given year, and we assume the worst.
+            const struct = (structure === "unknown" ? "wood" : structure) as Structure;
+            const era = classifyEra(building_year, struct);
+            const info = ERA_INFO[era];
+            return {
+              era,
+              assumed_structure: structure === "unknown" ? "wood (assumed: least favourable)" : struct,
+              classification: language === "ja" ? info.label_ja : info.label_en,
+              ...bi(info.en, info.ja, language),
+              action: bi(
+                "Book a 耐震診断 (seismic diagnosis) through your municipality. Call taishin_subsidy_guide for the route and the framework.",
+                "自治体経由で耐震診断を申し込んでください。手順と制度は taishin_subsidy_guide をご利用ください。",
+                language
+              ),
+              not_a_verdict: bi(
+                "An era classification is not a structural assessment. Only a professional seismic diagnosis (耐震診断) can assess this building.",
+                "区分は構造評価ではありません。この建物を評価できるのは専門家の耐震診断だけです。",
+                language
+              ),
+            };
+          })()
+        : bi(
+            "No build year given, so assume the building is unassessed. Find the 建築確認 year and call building_seismic_check.",
+            "建築年が未入力のため、未評価の建物として扱ってください。建築確認の年を確認し building_seismic_check をご利用ください。",
+            language
+          );
+
+    return ok({
+      household: { people: supplies.people, floor, structure: structure ?? "unknown", near_coast_or_river: coastal },
+      stockpile: {
+        days: supplies.days,
+        water_litres: supplies.water_litres,
+        meals: supplies.meals,
+        portable_toilet_uses: supplies.toilet_uses,
+        ...bi(supplies.basis_en, supplies.basis_ja, language),
+        source: language === "ja" ? QUANTITY_SOURCE.name_ja : QUANTITY_SOURCE.name_en,
+        source_url: QUANTITY_SOURCE.url,
+      },
+      do_now: bi(NOW_STEPS.en.join("\n"), NOW_STEPS.ja.join("\n"), language),
+      when_it_shakes: bi(WHEN_IT_SHAKES.en.join("\n"), WHEN_IT_SHAKES.ja.join("\n"), language),
+      ...(coastal === "unknown" ? { coastal_unresolved: bi(COASTAL_UNKNOWN.en, COASTAL_UNKNOWN.ja, language) } : {}),
+      structural,
+      this_is_a_floor: bi(PLAN_IS_NOT_A_VERDICT.en, PLAN_IS_NOT_A_VERDICT.ja, language),
+      ...disc(language),
+      attribution: `${STOCKPILE_SOURCE.name_en} · ${QUANTITY_SOURCE.name_en} · ${SOURCES.mlitTaishin.name_en}`,
+    });
   }
 );
 

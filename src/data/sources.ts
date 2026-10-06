@@ -40,6 +40,21 @@ export const SOURCES = {
     name_ja: "国土交通省 ハザードマップポータルサイト（重ねるハザードマップ）",
     url: "https://disaportal.gsi.go.jp/",
   },
+  japanPost: {
+    name_en: "Japan Post postal code data (via zipcloud)",
+    name_ja: "日本郵便 郵便番号データ（zipcloud 経由）",
+    url: "https://www.post.japanpost.jp/zipcode/",
+  },
+  bousaiStockpile: {
+    name_en: "Cabinet Office Disaster Preparedness (内閣府 防災情報)",
+    name_ja: "内閣府 防災情報のページ",
+    url: "https://www.bousai.go.jp/kyoiku/hokenkyousai/jishin.html",
+  },
+  tokyoBichiku: {
+    name_en: "Tokyo Bichiku Navi (東京備蓄ナビ)",
+    name_ja: "東京備蓄ナビ（東京都）",
+    url: "https://www.bichiku.metro.tokyo.lg.jp/",
+  },
   jshis: {
     name_en: "J-SHIS National Seismic Hazard Maps (NIED)",
     name_ja: "地震ハザードステーション J-SHIS（防災科研）",

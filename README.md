@@ -16,6 +16,31 @@ Most people underestimate the *reach*. The 30-year probability was revised by �
 
 The authoritative data is real, but it's scattered across five agencies and mostly buried in PDFs. This server makes it cited and usable from an AI assistant, without ever inventing a number.
 
+## The attitude: assume the worst
+
+The earthquake is unknown, and claiming we know is an illusion. So the refusal here is
+one-directional: the tools will alarm you with official numbers, and they will never
+reassure you.
+
+Where the official model publishes several cases, the severe one leads. A low
+probability is reported as a **floor, not a ceiling**, and is never relayed as good
+news. `location_probability` will tell you the government puts your mesh at a 12%
+chance of 震度6強 in 30 years; it will not tell you that means you are fine.
+
+## If you cannot write Japanese
+
+The official geocoder only reads Japanese addresses, which would have excluded the
+people this server is for. Give a **7-digit postal code** instead and every
+address-taking tool resolves it through Japan Post data:
+
+```
+232-0063        2320063        〒232-0063
+```
+
+That lands on the centre of your postal district rather than your building, and the
+tools say so in the response rather than pretending to more precision than they have.
+All output is available in English with `language: "en"`.
+
 ## Data rules
 
 - **No verdicts.** It reports official figures + plain-language meaning, never "your home is safe/unsafe."
@@ -112,6 +137,8 @@ Point the client config at the built entry:
 | `building_seismic_check` | Build year + structure → 旧耐震 / 新耐震 / 2000-standard classification with context. Not a verdict. |
 | `taishin_subsidy_guide` | Routes to subsidised, often-free 耐震診断 / 耐震補強 programs and the national support framework. |
 | `shindo_meaning` | What a JMA intensity (震度 5弱–7) means for people and buildings, on the official 気象庁 scale. |
+| `location_probability` | Address → the **official J-SHIS** 30-year probability of reaching each JMA intensity at that ~250m mesh, severe case first. All-source probabilistic (地震本部), **not** the Nankai scenario. Reported, never computed. |
+| `preparedness_plan` | Household details → a sourced plan: stockpile sized to the official one-week guidance, what to do now, what to do when it shakes, and the structural route. An officially recommended floor, not a verdict on survival. |
 | `geocode_address` | Address → coordinates via the GSI geocoder. Utility. |
 
 Prompts: `assess_home_earthquake_risk`, `nankai_briefing`.
@@ -149,9 +176,16 @@ Walk me through assessing my home's earthquake risk:
 静岡市葵区追手町9-6, built 1990, reinforced concrete.
 ```
 
-## Scope: v1 vs v2
+## Scope
 
-**v1 (this) does not compute a per-address Nankai intensity/tsunami value.** That data lives in bulk Cabinet Office GIS files that need an ingestion pipeline. Instead, `official_hazard_maps` bridges you to the official maps that already hold it. Computing it in-app is the deliberate **v2**.
+**This server does not compute its own per-address values.** Two different things follow
+from that:
+
+- It **reports** official published per-mesh probabilities (`location_probability`,
+  J-SHIS Y2024). Surfacing a government figure is not inventing one.
+- It **bridges** to the official maps for the Nankai scenario at an address
+  (`official_hazard_maps`). That data lives in bulk Cabinet Office GIS files needing an
+  ingestion pipeline, and faking it is not on the table.
 
 ## Headline figures (and where they come from)
 
