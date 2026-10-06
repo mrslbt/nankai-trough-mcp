@@ -1,6 +1,6 @@
 {
   "name": "nankai-trough-mcp",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Nankai Trough (南海トラフ地震) earthquake hazard and building-safety for AI assistants. Official Japanese government figures, cited and dated, never a safety verdict.",
   "mcpName": "io.github.mrslbt/nankai-trough",
   "keywords": [

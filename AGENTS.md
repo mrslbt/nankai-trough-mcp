@@ -7,40 +7,59 @@ Guide for AI coding agents (Claude Code, Cursor, Codex, Copilot…) working in t
 **nankai-trough-mcp** is an MCP server that surfaces official Japanese government data on the Nankai Trough (南海トラフ地震) earthquake hazard and Japanese building seismic standards, so an AI assistant can answer "how bad is it, how far does it reach, and what does my build year mean?" with cited figures instead of guesses. It never returns a safety verdict.
 
 - npm: `nankai-trough-mcp` · registry name: `io.github.mrslbt/nankai-trough`
-- Local **stdio** server, **read-only**, bundled data + one official geocoder call, no API keys.
-- Six tools, two prompts, four resources. Entry tool: **`nankai_overview`** (scale and reach); **`official_hazard_maps`** bridges to the official per-address maps.
+- Local **stdio** server, **read-only**, bundled data plus official lookups (GSI geocoder, Japan Post postal data via zipcloud, J-SHIS), no API keys.
+- Eight tools, two prompts, four resources. Entry tool: **`nankai_overview`** (scale and reach); **`official_hazard_maps`** bridges to the official per-address maps; **`location_probability`** reports official J-SHIS per-mesh probabilities.
+- Attitude: **assume the worst.** Lead with the severe case, treat low probabilities as floors, and resolve ambiguous inputs (boundary years, unknown structure, unknown coast) toward the less favourable reading.
 
 ## Quick commands
 
 ```bash
-npm install        # deps
-npm run build      # tsc → dist/   (must pass before commit)
-npm test           # build + node --test test/*.test.mjs   (must pass before commit)
-npm run smoke      # build + a live MCP round-trip (lists tools + resources, classifies a 1975 wooden house)
-npm run dev        # tsc --watch
+npm install          # deps
+npm run build        # tsc → dist/   (must pass before commit)
+npm test             # build + node --test test/*.test.mjs   (must pass before commit)
+npm run smoke        # build + a local MCP round-trip (all 8 tools listed, 1975 wood and 1975 RC building checks, resources)
+npm run acceptance   # build + LIVE J-SHIS / geocoder / postal lookups (needs network)
+npm run dev          # tsc --watch
 ```
 
-Pre-commit: `npm run build && npm test`. Both must pass. 11 tests today.
+Pre-commit: `npm run build && npm test && npm run smoke`. All must pass.
 
 ## Architecture (the whole mental model)
 
 ```
 src/
-├── index.ts            # McpServer, registers the 6 tools + 2 prompts + 4 resources + server instructions (the no-verdict rules)
+├── index.ts            # McpServer, registers the 8 tools + 2 prompts + 4 resources + server instructions (the no-verdict rules)
 ├── meta.ts             # READONLY / READONLY_EXTERNAL annotations
 ├── resources.ts        # RESOURCES, reference docs rendered FROM the data below (no second copy, no drift)
 ├── data/
 │   ├── nankai.ts       # NANKAI_FACTS, the headline figures, each with source + as-of + a VERIFICATION LOG header
-│   ├── building.ts     # classifyEra(year, structure); ERA_INFO; KUMAMOTO_WOOD field data
+│   ├── building.ts     # classifyEra(year, structure); ERA_INFO; KUMAMOTO_WOOD field data (wood-only, never shown for non-wood)
+│   ├── jshis.ts        # J-SHIS per-mesh 30-year probabilities (MAX + AVR, MAX first), floor-not-ceiling text
+│   ├── prepare.ts      # preparedness content + 7-day stockpile sizing
 │   ├── shindo.ts       # JMA 震度 5弱–7 meanings
 │   ├── subsidy.ts      # 耐震診断/補強 routing (never quotes an amount; varies by municipality)
 │   └── sources.ts      # SOURCES, DISCLAIMER, ATTRIBUTION: single source of truth, every figure traces here
 └── lib/
-    ├── geocode.ts      # GSI geocoder + parsePrefMuni() (pure, tested)
+    ├── geocode.ts      # GSI geocoder with postal-code fallback + parsePrefMuni() (pure, tested)
+    ├── postal.ts       # Japan Post postal code → kanji address (zipcloud), extractPostalCode() (pure, tested)
     ├── maps.ts         # hazardMapLinks(), pure builder for the official per-address map URLs (tested)
     ├── fetch.ts        # safeFetch (hard timeout, UA, throws on non-OK)
     └── cache.ts        # getOrFetch + TTL
 ```
+
+### Building eras
+
+`classifyEra` splits by structure as well as year. Boundary years get their own era so the tool never hands out the newer, more favourable label on a guess:
+
+| Year | Wood | Non-wood |
+|---|---|---|
+| ≤1980 | `pre_1981` (Kumamoto 28.2%) | `pre_1981_nonwood` (no wood figures) |
+| 1981 | `boundary_1981` | `boundary_1981` |
+| 1982–1999 | `1981_2000` (8.7%) | `post_1981_nonwood` |
+| 2000 | `boundary_2000_wood` (2000 standard applies from June) | `post_1981_nonwood` |
+| ≥2001 | `post_2000_wood` (2.2%) | `post_1981_nonwood` |
+
+The Kumamoto rates (MLIT, wooden houses only: 28.2% / 8.7% / 2.2%, split at 1981-06 and 2000-06) must never appear in a non-wood era; a test enforces it.
 
 The SDK is `@modelcontextprotocol/sdk` (1.29+), zod 4. Annotations match each tool's actual reach: pure-compute tools use `READONLY` (`openWorldHint: false`); anything that calls the GSI geocoder uses `READONLY_EXTERNAL` (`openWorldHint: true`).
 

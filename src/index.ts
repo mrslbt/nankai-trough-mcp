@@ -29,7 +29,7 @@ const LANG = z
   .meta({ title: "Language" });
 
 const server = new McpServer(
-  { name: "nankai-trough-mcp", version: "0.2.0" },
+  { name: "nankai-trough-mcp", version: "0.2.1" },
   {
     instructions: `Nankai Trough (南海トラフ地震) earthquake hazard + building-safety engine. Surfaces ONLY official Japanese government data.
 
@@ -166,6 +166,7 @@ server.registerTool(
         ...bi(KUMAMOTO_WOOD.note_en, KUMAMOTO_WOOD.note_ja, language),
         pre_1981_collapse_or_severe_pct: KUMAMOTO_WOOD.pre_1981_collapse_severe_pct,
         y1981_2000_collapse_or_severe_pct: KUMAMOTO_WOOD.y1981_2000_collapse_severe_pct,
+        post_2000_collapse_or_severe_pct: KUMAMOTO_WOOD.post_2000_collapse_severe_pct,
       };
     }
     return ok(out);
@@ -404,7 +405,7 @@ server.registerPrompt(
   "assess_home_earthquake_risk",
   {
     title: "Assess my home's earthquake risk",
-    description: "Guided walkthrough: scale, then the official maps, building standard, and subsidy. Never a verdict.",
+    description: "Guided walkthrough: scale, official maps, official probabilities, building standard, subsidy, and a preparedness plan. Never a verdict.",
     argsSchema: {
       address: z.string().describe("Japanese address of the home"),
       build_year: z.string().describe("Build year (建築確認), e.g. 1990"),
@@ -417,7 +418,7 @@ server.registerPrompt(
         role: "user",
         content: {
           type: "text",
-          text: `Help me understand the Nankai Trough earthquake risk for my home at "${address}" (built ${build_year}, ${structure}).\n\nDo this, and DO NOT tell me I'm "safe" or "unsafe":\n1. nankai_overview for the scale and reach.\n2. official_hazard_maps with my address, give me the official maps for my exact predicted shaking and tsunami.\n3. building_seismic_check with build_year=${build_year}, structure=${structure}, for my building's standard.\n4. taishin_subsidy_guide for my municipality, the subsidised 耐震診断 I should get.\n\nPass through every source and disclaimer.`,
+          text: `Help me understand the Nankai Trough earthquake risk for my home at "${address}" (built ${build_year}, ${structure}).\n\nDo this, and DO NOT tell me I'm "safe" or "unsafe":\n1. nankai_overview for the scale and reach.\n2. official_hazard_maps with my address, give me the official maps for my exact predicted shaking and tsunami.\n3. location_probability with my address, for the official 30-year probabilities at my location (maximum case first, a floor not a ceiling).\n4. building_seismic_check with build_year=${build_year}, structure=${structure}, for my building's standard.\n5. taishin_subsidy_guide for my municipality, the subsidised 耐震診断 I should get.\n6. preparedness_plan for what to do now and when it shakes.\n\nPass through every source and disclaimer.`,
         },
       },
     ],

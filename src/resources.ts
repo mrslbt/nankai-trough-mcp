@@ -103,8 +103,8 @@ The boundary is the 建築確認 (building-confirmation) date, not completion. T
 ## 2016 Kumamoto earthquake wooden-house field data
 Collapse / severe-damage rate by era (wood only):
 - Pre-1981 (旧耐震): **${KUMAMOTO_WOOD.pre_1981_collapse_severe_pct}%**
-- 1981–2000: **${KUMAMOTO_WOOD.y1981_2000_collapse_severe_pct}%**
-- Post-2000: lowest
+- 1981-06 to 2000-05: **${KUMAMOTO_WOOD.y1981_2000_collapse_severe_pct}%**
+- 2000-06 onward: **${KUMAMOTO_WOOD.post_2000_collapse_severe_pct}%**
 
 ${KUMAMOTO_WOOD.note_en}
 

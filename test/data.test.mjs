@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { classifyEra } from "../dist/data/building.js";
+import { classifyEra, ERA_INFO, KUMAMOTO_WOOD } from "../dist/data/building.js";
+import { extractPostalCode } from "../dist/lib/postal.js";
 import { SHINDO } from "../dist/data/shindo.js";
 import { NANKAI_FACTS } from "../dist/data/nankai.js";
 import { parsePrefMuni } from "../dist/lib/geocode.js";
@@ -12,9 +13,40 @@ test("building era classification matches the 1981 / 2000 boundaries", () => {
   assert.equal(classifyEra(1980, "wood"), "pre_1981");
   assert.equal(classifyEra(1981, "wood"), "boundary_1981");
   assert.equal(classifyEra(1990, "wood"), "1981_2000");
+  assert.equal(classifyEra(1999, "wood"), "1981_2000");
+  assert.equal(classifyEra(2000, "wood"), "boundary_2000_wood", "2000 standard starts in June; year 2000 must not get the newer label");
+  assert.equal(classifyEra(2001, "wood"), "post_2000_wood");
   assert.equal(classifyEra(2010, "wood"), "post_2000_wood");
+  assert.equal(classifyEra(1975, "reinforced_concrete"), "pre_1981_nonwood");
+  assert.equal(classifyEra(1980, "steel"), "pre_1981_nonwood");
+  assert.equal(classifyEra(1981, "steel"), "boundary_1981");
+  assert.equal(classifyEra(2000, "reinforced_concrete"), "post_1981_nonwood");
   assert.equal(classifyEra(2010, "reinforced_concrete"), "post_1981_nonwood");
   assert.equal(classifyEra(1990, "steel"), "post_1981_nonwood");
+});
+
+test("the wood-only Kumamoto collapse rate never appears in a non-wood era", () => {
+  for (const [era, info] of Object.entries(ERA_INFO)) {
+    if (!era.includes("nonwood")) continue;
+    for (const pct of [KUMAMOTO_WOOD.pre_1981_collapse_severe_pct, KUMAMOTO_WOOD.y1981_2000_collapse_severe_pct, KUMAMOTO_WOOD.post_2000_collapse_severe_pct]) {
+      assert.ok(!info.en.includes(`${pct}%`) && !info.ja.includes(`${pct}%`), `${era} must not quote the wood-only ${pct}%`);
+    }
+  }
+});
+
+test("the Kumamoto note credits the post-2000 standard, in both languages", () => {
+  assert.match(KUMAMOTO_WOOD.note_en, /post-2000/i);
+  assert.doesNotMatch(KUMAMOTO_WOOD.note_en, /pre-2000/i);
+  assert.match(KUMAMOTO_WOOD.note_ja, /2000年基準/);
+  assert.equal(KUMAMOTO_WOOD.post_2000_collapse_severe_pct, 2.2);
+});
+
+test("postal-code extraction ignores phone numbers", () => {
+  assert.equal(extractPostalCode("232-0063"), "2320063");
+  assert.equal(extractPostalCode("〒232-0063"), "2320063");
+  assert.equal(extractPostalCode("2320063 Yokohama"), "2320063");
+  assert.equal(extractPostalCode("東京都港区 tel 03-1234-5678"), undefined);
+  assert.equal(extractPostalCode("〒232-0063 tel 03-1234-5678"), "2320063");
 });
 
 test("JMA intensity scale covers 5弱..7", () => {
@@ -44,6 +76,13 @@ test("address parsing splits prefecture and municipality correctly", () => {
   assert.deepEqual(parsePrefMuni("東京都千代田区"), { prefecture: "東京都", municipality: "千代田区" });
   assert.equal(parsePrefMuni("和歌山県東牟婁郡那智勝浦町").prefecture, "和歌山県");
   assert.deepEqual(parsePrefMuni("not an address"), {});
+  // City names that contain 市 or 町 before the final 市
+  assert.equal(parsePrefMuni("三重県四日市市諏訪町").municipality, "四日市市");
+  assert.equal(parsePrefMuni("広島県廿日市市下平良").municipality, "廿日市市");
+  assert.equal(parsePrefMuni("新潟県十日町市本町").municipality, "十日町市");
+  assert.equal(parsePrefMuni("長野県大町市大町").municipality, "大町市");
+  assert.equal(parsePrefMuni("東京都町田市森野").municipality, "町田市");
+  assert.equal(parsePrefMuni("千葉県市川市八幡").municipality, "市川市");
 });
 
 test("hazard-map links are official gov URLs and carry the address coordinates", () => {

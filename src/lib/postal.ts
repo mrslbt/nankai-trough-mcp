@@ -19,9 +19,13 @@ export interface PostalResult {
   kanji: string;
 }
 
-/** Pull a 7-digit Japanese postal code out of free text. Accepts 2320063, 232-0063, 〒232-0063. */
+/**
+ * Pull a 7-digit Japanese postal code out of free text. Accepts 2320063, 232-0063, 〒232-0063.
+ * Not preceded by a digit or hyphen, so the tail of a phone number (03-1234-5678)
+ * is not mistaken for a postal code.
+ */
 export function extractPostalCode(input: string): string | undefined {
-  const m = input.match(/(?:〒\s*)?(\d{3})[-\s]?(\d{4})(?!\d)/);
+  const m = input.match(/(?:〒\s*)?(?<![\d-])(\d{3})[-\s]?(\d{4})(?!\d)/);
   return m ? `${m[1]}${m[2]}` : undefined;
 }
 

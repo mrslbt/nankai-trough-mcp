@@ -11,8 +11,17 @@ try {
   const names = tools.map((t) => t.name).sort();
   assert.deepEqual(
     names,
-    ["building_seismic_check", "geocode_address", "nankai_overview", "official_hazard_maps", "shindo_meaning", "taishin_subsidy_guide"],
-    "expected the 6 v1 tools"
+    [
+      "building_seismic_check",
+      "geocode_address",
+      "location_probability",
+      "nankai_overview",
+      "official_hazard_maps",
+      "preparedness_plan",
+      "shindo_meaning",
+      "taishin_subsidy_guide",
+    ],
+    "expected the 8 tools"
   );
   assert.ok(tools.every((t) => t.annotations?.readOnlyHint === true), "every tool must be read-only");
   assert.ok(
@@ -25,6 +34,12 @@ try {
   const bd = JSON.parse(b.content.map((c) => c.text).join("\n"));
   assert.match(JSON.stringify(bd), /旧耐震|pre-1981/i, "1975 wood should read as old standard");
   assert.ok(/not a verdict/i.test(JSON.stringify(bd)) || bd.not_a_verdict, "must include the not-a-verdict statement");
+
+  // A pre-1981 concrete building must not be shown the wood-only Kumamoto rate.
+  const rc = await client.callTool({ name: "building_seismic_check", arguments: { build_year: 1975, structure: "reinforced_concrete", language: "both" } });
+  const rcText = rc.content.map((c) => c.text).join("\n");
+  assert.doesNotMatch(rcText, /28\.2%/, "1975 RC must not quote the wood-only 28.2%");
+  assert.match(rcText, /非木造|non-wood/i, "1975 RC must be labelled non-wood");
 
   const o = await client.callTool({ name: "nankai_overview", arguments: { language: "en" } });
   const od = JSON.parse(o.content.map((c) => c.text).join("\n"));

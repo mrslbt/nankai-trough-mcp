@@ -26,7 +26,13 @@ export function parsePrefMuni(normalized: string): { prefecture?: string; munici
   if (!pm) return {};
   const prefecture = pm[1];
   const rest = normalized.slice(prefecture.length);
-  const municipality = rest.match(/^(.+?[市区町村])/)?.[1];
+  let municipality = rest.match(/^(.+?[市区町村])/)?.[1];
+  // The lazy match stops at the first 市/町, which truncates city names that
+  // contain one (四日市市, 廿日市市, 十日町市, 大町市). If the next character is 市,
+  // the name continues. County towns (…郡…町) are real towns, so leave those alone.
+  if (municipality && !municipality.includes("郡") && /[市町]$/.test(municipality) && rest[municipality.length] === "市") {
+    municipality += "市";
+  }
   return { prefecture, municipality };
 }
 
